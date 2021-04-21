@@ -1,0 +1,20 @@
+# Godot
+.import/
+export.cfg
+export_presets.cfg
+
+# Mono
+.mono/
+data_*/
+mono_crash.*.json
+
+# VSCode
+.vscode/
+
+# Krita
+*.png~
+*.jpg~
+*.kra~
+
+# Builds
+Builds/

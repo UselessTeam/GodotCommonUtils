@@ -1,0 +1,301 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Scripts/GUI/Keybindings.cs" type="Script" id=1]
+[ext_resource path="res://Scenes/KeybindingElement.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Scripts/GodotExtensions/SmartOptionButton.cs" type="Script" id=3]
+
+[sub_resource type="Animation" id=1]
+resource_name = "splash_screen"
+length = 3.0
+tracks/0/type = "value"
+tracks/0/path = NodePath("SplashScreen:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 3 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("SplashScreen/SplashMain:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ true ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("SplashScreen/SplashMain:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 0.5, 2, 2.7 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 0 ) ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("SplashScreen:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0, 2.6, 3 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 0 ) ]
+}
+
+[node name="IntroMenu" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Menu" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MenuBackground" type="TextureRect" parent="Menu"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Menu buttons" type="VBoxContainer" parent="Menu"]
+margin_left = 760.801
+margin_top = 326.728
+margin_right = 910.801
+margin_bottom = 460.728
+size_flags_vertical = 3
+custom_constants/separation = 15
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="StartGame" type="Button" parent="Menu/Menu buttons"]
+margin_right = 150.0
+margin_bottom = 20.0
+text = "Start Game"
+
+[node name="Settings" type="Button" parent="Menu/Menu buttons"]
+margin_top = 35.0
+margin_right = 150.0
+margin_bottom = 55.0
+text = "Settings"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Credits" type="Button" parent="Menu/Menu buttons"]
+margin_top = 70.0
+margin_right = 150.0
+margin_bottom = 90.0
+text = "Credits"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Quit" type="Button" parent="Menu/Menu buttons"]
+margin_top = 105.0
+margin_right = 150.0
+margin_bottom = 125.0
+text = "Quit"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Settings" type="TabContainer" parent="Menu"]
+margin_left = 114.539
+margin_top = 65.1653
+margin_right = 614.539
+margin_bottom = 515.165
+all_tabs_in_front = true
+use_hidden_tabs_for_min_size = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Keybindings" type="Control" parent="Menu/Settings"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 32.0
+margin_right = -4.0
+margin_bottom = -4.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+buttonContainerPath = NodePath("VBoxContainer")
+keybindingPopupPath = NodePath("../../KeybindingPopup")
+keybindingElement = ExtResource( 2 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Menu/Settings/Keybindings"]
+anchor_left = 0.1
+anchor_top = 0.05
+anchor_right = 0.9
+anchor_bottom = 0.95
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Video" type="Control" parent="Menu/Settings"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 32.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Menu/Settings/Video"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Fullscreen" type="HBoxContainer" parent="Menu/Settings/Video/VBoxContainer"]
+margin_right = 492.0
+margin_bottom = 24.0
+rect_pivot_offset = Vector2( -62.1368, 156.675 )
+
+[node name="Label" type="Label" parent="Menu/Settings/Video/VBoxContainer/Fullscreen"]
+margin_top = 5.0
+margin_right = 244.0
+margin_bottom = 19.0
+size_flags_horizontal = 3
+text = "Fullscreen"
+align = 1
+
+[node name="CheckBox" type="CheckBox" parent="Menu/Settings/Video/VBoxContainer/Fullscreen"]
+margin_left = 248.0
+margin_right = 492.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+align = 1
+expand_icon = true
+
+[node name="Resolution" type="HBoxContainer" parent="Menu/Settings/Video/VBoxContainer"]
+margin_top = 28.0
+margin_right = 492.0
+margin_bottom = 48.0
+rect_pivot_offset = Vector2( -62.1368, 156.675 )
+
+[node name="Label" type="Label" parent="Menu/Settings/Video/VBoxContainer/Resolution"]
+margin_top = 3.0
+margin_right = 244.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "Fullscreen"
+align = 1
+
+[node name="OptionButton" type="OptionButton" parent="Menu/Settings/Video/VBoxContainer/Resolution"]
+margin_left = 248.0
+margin_right = 492.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+align = 1
+selected = 7
+script = ExtResource( 3 )
+ItemList = PoolStringArray( "1024 x 768 (4:3)", "1280 x 1024 (5:4)", "1366 x 768 (16:9)", "1440 x 900 (16:10)", "1600 x 900 (16:9)", "1680 x 1050 (16:10)", "1920 x 1080 (16:9)", "1920 x 1200 (16:10)", "2560 x 1440 (16:9)", "3840 x 2160 (16:9)" )
+
+[node name="Audio" type="Control" parent="Menu/Settings"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 32.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="KeybindingPopup" type="Control" parent="Menu"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="ColorRect" parent="Menu/KeybindingPopup"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0, 0, 0, 0.160784 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Panel" type="PanelContainer" parent="Menu/KeybindingPopup"]
+margin_left = 435.262
+margin_top = 268.006
+margin_right = 635.262
+margin_bottom = 318.006
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="Menu/KeybindingPopup/Panel"]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 193.0
+margin_bottom = 43.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Press input ..."
+align = 1
+valign = 1
+
+[node name="SplashScreen" type="Control" parent="."]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="SplashBackground" type="ColorRect" parent="SplashScreen"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="SplashMain" type="Control" parent="SplashScreen"]
+modulate = Color( 1, 1, 1, 0 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="SplashScreen/SplashMain"]
+margin_left = 460.0
+margin_top = 231.0
+margin_right = 580.0
+margin_bottom = 262.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+text = "Splash screen text
+present"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+anims/splash_screen = SubResource( 1 )
