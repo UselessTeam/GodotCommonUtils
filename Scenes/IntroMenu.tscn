@@ -1,8 +1,11 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Scripts/GUI/Keybindings.cs" type="Script" id=1]
 [ext_resource path="res://Scenes/KeybindingElement.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Scripts/GodotExtensions/SmartOptionButton.cs" type="Script" id=3]
+[ext_resource path="res://Scripts/GUI/VideoSettings.cs" type="Script" id=4]
+[ext_resource path="res://Scripts/GUI/SplashScreen.cs" type="Script" id=5]
+[ext_resource path="res://Scripts/GUI/TitleScreenButtons.cs" type="Script" id=6]
 
 [sub_resource type="Animation" id=1]
 resource_name = "splash_screen"
@@ -56,12 +59,7 @@ tracks/3/keys = {
 "values": [ Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 0 ) ]
 }
 
-[node name="IntroMenu" type="Control"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
+[node name="TitleScreen" type="CanvasLayer"]
 
 [node name="Menu" type="Control" parent="."]
 anchor_right = 1.0
@@ -78,53 +76,55 @@ __meta__ = {
 }
 
 [node name="Menu buttons" type="VBoxContainer" parent="Menu"]
-margin_left = 760.801
-margin_top = 326.728
-margin_right = 910.801
-margin_bottom = 460.728
+anchor_left = 0.7
+anchor_top = 0.5
+anchor_right = 0.9
+anchor_bottom = 0.6
 size_flags_vertical = 3
-custom_constants/separation = 15
+custom_constants/separation = 20
+script = ExtResource( 6 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="StartGame" type="Button" parent="Menu/Menu buttons"]
-margin_right = 150.0
+margin_right = 320.0
 margin_bottom = 20.0
 text = "Start Game"
 
 [node name="Settings" type="Button" parent="Menu/Menu buttons"]
-margin_top = 35.0
-margin_right = 150.0
-margin_bottom = 55.0
+margin_top = 40.0
+margin_right = 320.0
+margin_bottom = 60.0
 text = "Settings"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="Credits" type="Button" parent="Menu/Menu buttons"]
-margin_top = 70.0
-margin_right = 150.0
-margin_bottom = 90.0
+margin_top = 80.0
+margin_right = 320.0
+margin_bottom = 100.0
 text = "Credits"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="Quit" type="Button" parent="Menu/Menu buttons"]
-margin_top = 105.0
-margin_right = 150.0
-margin_bottom = 125.0
+margin_top = 120.0
+margin_right = 320.0
+margin_bottom = 140.0
 text = "Quit"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="Settings" type="TabContainer" parent="Menu"]
-margin_left = 114.539
-margin_top = 65.1653
-margin_right = 614.539
-margin_bottom = 515.165
+visible = false
+anchor_left = 0.1
+anchor_top = 0.1
+anchor_right = 0.5
+anchor_bottom = 0.7
 all_tabs_in_front = true
 use_hidden_tabs_for_min_size = true
 __meta__ = {
@@ -133,88 +133,118 @@ __meta__ = {
 
 [node name="Keybindings" type="Control" parent="Menu/Settings"]
 visible = false
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = 4.0
-margin_top = 32.0
-margin_right = -4.0
-margin_bottom = -4.0
+anchor_left = 0.03
+anchor_top = 0.08
+anchor_right = 0.97
+anchor_bottom = 0.97
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
-buttonContainerPath = NodePath("VBoxContainer")
+buttonContainerPath = NodePath("ScrollContainer/VBoxContainer")
 keybindingPopupPath = NodePath("../../KeybindingPopup")
 keybindingElement = ExtResource( 2 )
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Menu/Settings/Keybindings"]
-anchor_left = 0.1
-anchor_top = 0.05
-anchor_right = 0.9
-anchor_bottom = 0.95
+[node name="ScrollContainer" type="ScrollContainer" parent="Menu/Settings/Keybindings"]
+anchor_right = 1.0
+anchor_bottom = 1.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Video" type="Control" parent="Menu/Settings"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Menu/Settings/Keybindings/ScrollContainer"]
+margin_right = 601.6
+size_flags_horizontal = 3
+custom_constants/separation = 10
+alignment = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Display" type="Control" parent="Menu/Settings"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 4.0
 margin_top = 32.0
 margin_right = -4.0
 margin_bottom = -4.0
+script = ExtResource( 4 )
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Menu/Settings/Video"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Menu/Settings/Display"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+custom_constants/separation = 10
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Fullscreen" type="HBoxContainer" parent="Menu/Settings/Video/VBoxContainer"]
-margin_right = 492.0
+[node name="Fullscreen" type="HBoxContainer" parent="Menu/Settings/Display/VBoxContainer"]
+margin_right = 632.0
 margin_bottom = 24.0
 rect_pivot_offset = Vector2( -62.1368, 156.675 )
 
-[node name="Label" type="Label" parent="Menu/Settings/Video/VBoxContainer/Fullscreen"]
+[node name="Label" type="Label" parent="Menu/Settings/Display/VBoxContainer/Fullscreen"]
 margin_top = 5.0
-margin_right = 244.0
+margin_right = 314.0
 margin_bottom = 19.0
 size_flags_horizontal = 3
 text = "Fullscreen"
 align = 1
 
-[node name="CheckBox" type="CheckBox" parent="Menu/Settings/Video/VBoxContainer/Fullscreen"]
-margin_left = 248.0
-margin_right = 492.0
+[node name="CheckBox" type="CheckBox" parent="Menu/Settings/Display/VBoxContainer/Fullscreen"]
+margin_left = 318.0
+margin_right = 632.0
 margin_bottom = 24.0
 size_flags_horizontal = 3
 align = 1
 expand_icon = true
 
-[node name="Resolution" type="HBoxContainer" parent="Menu/Settings/Video/VBoxContainer"]
-margin_top = 28.0
-margin_right = 492.0
-margin_bottom = 48.0
+[node name="Borderless" type="HBoxContainer" parent="Menu/Settings/Display/VBoxContainer"]
+visible = false
+margin_top = 34.0
+margin_right = 632.0
+margin_bottom = 58.0
 rect_pivot_offset = Vector2( -62.1368, 156.675 )
 
-[node name="Label" type="Label" parent="Menu/Settings/Video/VBoxContainer/Resolution"]
-margin_top = 3.0
-margin_right = 244.0
-margin_bottom = 17.0
+[node name="Label" type="Label" parent="Menu/Settings/Display/VBoxContainer/Borderless"]
+margin_top = 5.0
+margin_right = 314.0
+margin_bottom = 19.0
 size_flags_horizontal = 3
-text = "Fullscreen"
+text = "Borderless"
 align = 1
 
-[node name="OptionButton" type="OptionButton" parent="Menu/Settings/Video/VBoxContainer/Resolution"]
-margin_left = 248.0
-margin_right = 492.0
+[node name="CheckBox" type="CheckBox" parent="Menu/Settings/Display/VBoxContainer/Borderless"]
+margin_left = 318.0
+margin_right = 632.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+align = 1
+expand_icon = true
+
+[node name="Resolution" type="HBoxContainer" parent="Menu/Settings/Display/VBoxContainer"]
+margin_top = 34.0
+margin_right = 632.0
+margin_bottom = 54.0
+rect_pivot_offset = Vector2( -62.1368, 156.675 )
+
+[node name="Label" type="Label" parent="Menu/Settings/Display/VBoxContainer/Resolution"]
+margin_top = 3.0
+margin_right = 314.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "Resolution"
+align = 1
+
+[node name="OptionButton" type="OptionButton" parent="Menu/Settings/Display/VBoxContainer/Resolution"]
+margin_left = 318.0
+margin_right = 632.0
 margin_bottom = 20.0
 size_flags_horizontal = 3
 align = 1
-selected = 7
 script = ExtResource( 3 )
 ItemList = PoolStringArray( "1024 x 768 (4:3)", "1280 x 1024 (5:4)", "1366 x 768 (16:9)", "1440 x 900 (16:10)", "1600 x 900 (16:9)", "1680 x 1050 (16:10)", "1920 x 1080 (16:9)", "1920 x 1200 (16:10)", "2560 x 1440 (16:9)", "3840 x 2160 (16:9)" )
+DefaultItem = 4
 
 [node name="Audio" type="Control" parent="Menu/Settings"]
 visible = false
@@ -265,6 +295,7 @@ valign = 1
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
+script = ExtResource( 5 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -272,6 +303,7 @@ __meta__ = {
 [node name="SplashBackground" type="ColorRect" parent="SplashScreen"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+color = Color( 0.0588235, 0.0588235, 0.0588235, 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -285,14 +317,15 @@ __meta__ = {
 }
 
 [node name="Label" type="Label" parent="SplashScreen/SplashMain"]
-margin_left = 460.0
-margin_top = 231.0
-margin_right = 580.0
-margin_bottom = 262.0
-custom_colors/font_color = Color( 0, 0, 0, 1 )
+anchor_left = 0.4
+anchor_top = 0.4
+anchor_right = 0.6
+anchor_bottom = 0.6
+custom_colors/font_color = Color( 1, 1, 1, 1 )
 text = "Splash screen text
 present"
 align = 1
+valign = 1
 __meta__ = {
 "_edit_use_anchors_": false
 }
