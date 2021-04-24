@@ -18,7 +18,3 @@ mono_crash.*.json
 
 # Builds
 Builds/
-
-GodotCommonUtils.sln
-project.godot
-default_env.tres
