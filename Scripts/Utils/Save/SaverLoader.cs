@@ -10,20 +10,23 @@ namespace Utils {
         List<Resource> resources = new List<Resource>();
         List<Godot.Collections.Dictionary> encoded_resources = new List<Godot.Collections.Dictionary>();
 
-        public static string SaveSingle(Resource resource) {
+        public static string SaveSingle (Resource resource) {
             Saver saver = new Saver();
             saver.ToKey(resource);
             return saver.Flush();
         }
-        public static string SaveSingle(ISaveable saveable) {
+        public static string SaveSingle (ISaveable saveable) {
             Saver saver = new Saver();
             var object_data = saver.EncodeObject(saveable);
-            return saver.Flush() + "\n" + JSON.Print(object_data);
+            return JSON.Print(object_data) + "\n" + saver.Flush();
         }
-        public string Flush() {
-            return JSON.Print(encoded_resources);
+        public string Flush () {
+            if (encoded_resources.Count > 0) {
+                return JSON.Print(encoded_resources);
+            }
+            return "";
         }
-        public int ToKey(Resource resource) {
+        public int ToKey (Resource resource) {
             int index = resources.IndexOf(resource);
             if (index == -1) {
                 index = resources.Count;
@@ -34,7 +37,7 @@ namespace Utils {
             return index;
         }
 
-        private object Encode(object obj) {
+        private object Encode (object obj) {
             if (obj == null) {
                 return null;
             }
@@ -65,7 +68,7 @@ namespace Utils {
             return obj;
         }
 
-        private Godot.Collections.Dictionary EncodeObject(object obj) {
+        private Godot.Collections.Dictionary EncodeObject (object obj) {
             Type type = obj.GetType();
             var data = new Godot.Collections.Dictionary();
             data["type"] = type.FullName;
@@ -80,27 +83,27 @@ namespace Utils {
         List<Godot.Collections.Dictionary> encoded_resources = new List<Godot.Collections.Dictionary>();
         Dictionary<int, Resource> objects = new Dictionary<int, Resource>();
 
-        public static Loader Load(string value) {
+        public static Loader Load (string value) {
             Loader instance = new Loader();
             instance.encoded_resources = ((Godot.Collections.Array) JSON.Parse(value).Result).Cast<object>().Select(obj => (Godot.Collections.Dictionary) obj).ToList();
             return instance;
         }
-        public static object LoadSingle(string data) {
+        public static object LoadSingle (string data) {
             return Load(data).FromKey(0);
         }
 
-        public ISaveable FromData(string data) {
+        public ISaveable FromData (string data) {
             return FromData((Godot.Collections.Dictionary) JSON.Parse(data).Result);
         }
 
-        public ISaveable FromData(Godot.Collections.Dictionary data) {
+        public ISaveable FromData (Godot.Collections.Dictionary data) {
             Type type = Type.GetType((string) data["type"]);
             ISaveable saveable = (ISaveable) Activator.CreateInstance(type);
             DecodeObject(saveable, data);
             return saveable;
         }
 
-        public Resource FromKey(int key) {
+        public Resource FromKey (int key) {
             if (!objects.ContainsKey(key)) {
                 Godot.Collections.Dictionary data = encoded_resources[key];
                 Type type = Type.GetType((string) data["type"]);
@@ -110,7 +113,7 @@ namespace Utils {
             return objects[key];
         }
 
-        private object Decode(Type type, object data) {
+        private object Decode (Type type, object data) {
             if (data == null) {
                 return null;
             }
@@ -161,7 +164,7 @@ namespace Utils {
 
         }
 
-        private object DecodeObject(object obj, object _data) {
+        private object DecodeObject (object obj, object _data) {
             Godot.Collections.Dictionary data;
             if (_data == null) {
                 return null;

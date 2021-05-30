@@ -28,7 +28,7 @@ public class VideoSettings : Control {
         if (!OS.WindowFullscreen)
             OS.WindowSize = newResolution;
 
-        GetTree().SetScreenStretch(SceneTree.StretchMode.Mode2d, SceneTree.StretchAspect.Keep, newResolution); //TODO
+        GetTree().SetScreenStretch(SceneTree.StretchMode.Disabled, SceneTree.StretchAspect.Ignore, newResolution); //TODO
 
         var canvasTransform = GetViewport().CanvasTransform;
         canvasTransform.Scale = newResolution / baseResolution;

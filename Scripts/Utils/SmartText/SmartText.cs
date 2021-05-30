@@ -11,7 +11,7 @@ namespace Utils {
             TextMemory.MetaTag metaTag = TextMemory.Parse(info);
             switch (metaTag.group) {
                 case '?':
-                    //ThoughtPopup.Instance.Open(metaTag.key);
+                    ThoughtPopup.Instance.Open(metaTag.key);
                     break;
                 case '~':
                     if (metaTag.key == "village") {

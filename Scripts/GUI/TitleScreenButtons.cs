@@ -3,10 +3,18 @@ using Godot;
 
 public class TitleScreenButtons : VBoxContainer {
 
-    [Export] PackedScene startGameScene;
+    [Export] PackedScene newGameScene;
+    [Export] PackedScene loadGameScene;
 
     public override void _Ready () {
-        Callback.Connect(GetNode<Button>("StartGame"), "pressed", () => GetTree().ChangeSceneTo(startGameScene));
+        var loadButton = GetNode<Button>("LoadGame");
+        if (!Utils.FileEncoder.SaveExists())
+            loadButton.Disabled = true;
+        else {
+            Callback.Connect(loadButton, "pressed", () => GetTree().ChangeSceneTo(loadGameScene));
+        }
+
+        Callback.Connect(GetNode<Button>("StartGame"), "pressed", () => GetTree().ChangeSceneTo(newGameScene));
 
         Callback.Connect(GetNode<Button>("Settings"), "pressed", () => {
             var settings = GetNode<Control>("../Settings");
