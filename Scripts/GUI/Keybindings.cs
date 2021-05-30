@@ -17,6 +17,7 @@ public class Keybindings : Control {
     public string ActionWaitingForInput { get; protected set; } = null;
 
     [Export] bool SkipUiActions = true;
+    [Export] bool SkipDebugActions = true;
 
     [Export] NodePath buttonContainerPath;
     Control buttonContainer;
@@ -36,6 +37,7 @@ public class Keybindings : Control {
 
         foreach (string action in InputMap.GetActions()) {
             if (SkipUiActions && action.StartsWith("ui_")) continue;
+            if (SkipDebugActions && action.StartsWith("debug_")) continue;
 
             KeybindingElement element = (KeybindingElement) keybindingElement.Instance();
             buttonContainer.AddChild(element);
