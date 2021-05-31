@@ -1,10 +1,18 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 
 public class TitleScreenButtons : VBoxContainer {
 
     [Export] PackedScene newGameScene;
     [Export] PackedScene loadGameScene;
+
+    List<Control> panels;
+
+    void HidePanels () {
+        foreach (var panel in panels)
+            panel.Hide();
+    }
 
     public override void _Ready () {
         var loadButton = GetNode<Button>("LoadGame");
@@ -16,10 +24,28 @@ public class TitleScreenButtons : VBoxContainer {
 
         Callback.Connect(GetNode<Button>("StartGame"), "pressed", () => GetTree().ChangeSceneTo(newGameScene));
 
+        panels = new List<Control>() {
+            GetNode<Control>("../Settings"),
+            GetNode<Control>("../Credits")
+        };
+
         Callback.Connect(GetNode<Button>("Settings"), "pressed", () => {
-            var settings = GetNode<Control>("../Settings");
-            if (settings.Visible) settings.Hide();
-            else settings.Show();
+            var settings = panels[0];
+            if (settings.Visible)
+                settings.Hide();
+            else {
+                HidePanels();
+                settings.Show();
+            }
+        });
+
+        Callback.Connect(GetNode<Button>("Credits"), "pressed", () => {
+            var credits = panels[1];
+            if (credits.Visible) credits.Hide();
+            else {
+                HidePanels();
+                credits.Show();
+            }
         });
 
         Callback.Connect(GetNode<Button>("Quit"), "pressed", () => GetTree().Quit());
