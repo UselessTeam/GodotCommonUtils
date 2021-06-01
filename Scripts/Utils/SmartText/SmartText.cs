@@ -18,9 +18,13 @@ namespace Utils {
                         GetTree().ChangeScene("res://Scenes/VillageScene.tscn");
                     } else if (metaTag.key == "combat") {
                         GetTree().ChangeScene("res://Scenes/CombatScene.tscn");
+                    } else if (metaTag.key == "title") {
+                        Global.SaveGame();
+                        GetTree().ChangeScene("res://Scenes/TitleScreen.tscn");
                     } else {
                         GD.PrintErr("Unknown scene");
                     }
+                    ThoughtPopup.Instance.Hide();
                     break;
             }
         }
