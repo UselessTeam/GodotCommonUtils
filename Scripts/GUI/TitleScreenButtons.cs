@@ -7,6 +7,9 @@ public class TitleScreenButtons : VBoxContainer {
     [Export] PackedScene newGameScene;
     [Export] PackedScene loadGameScene;
 
+    [Signal] public delegate void NewGame ();
+    [Signal] public delegate void LoadGame ();
+
     List<Control> panels;
 
     void HidePanels () {
@@ -19,10 +22,16 @@ public class TitleScreenButtons : VBoxContainer {
         if (!Utils.FileEncoder.SaveExists())
             loadButton.Disabled = true;
         else {
-            Callback.Connect(loadButton, "pressed", () => GetTree().ChangeSceneTo(loadGameScene));
+            Callback.Connect(loadButton, "pressed", () => {
+                EmitSignal(nameof(LoadGame));
+                GetTree().ChangeSceneTo(loadGameScene);
+            });
         }
 
-        Callback.Connect(GetNode<Button>("StartGame"), "pressed", () => GetTree().ChangeSceneTo(newGameScene));
+        Callback.Connect(GetNode<Button>("StartGame"), "pressed", () => {
+            EmitSignal(nameof(NewGame));
+            GetTree().ChangeSceneTo(newGameScene);
+        });
 
         panels = new List<Control>() {
             GetNode<Control>("../Settings"),

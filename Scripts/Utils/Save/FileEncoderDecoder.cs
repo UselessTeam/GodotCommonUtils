@@ -31,6 +31,11 @@ namespace Utils {
             return data;
         }
 
+        public static void Delete () {
+            var dir = new Directory();
+            dir.Remove(savePath);
+        }
+
         public static bool SaveExists () {
             return new File().FileExists(savePath);
         }
