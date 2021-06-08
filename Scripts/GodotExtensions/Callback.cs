@@ -8,11 +8,11 @@ public class Callback : Node {
     public void Execute () {
         if (callback != null) {
             callback();
-            if (CallOnce == true) QueueFree();
+            if (callOnce == true) QueueFree();
         } else QueueFree();
     }
 
-    public bool CallOnce = false;
+    bool callOnce = false;
 
     public Callback (Action action) {
         this.callback = action;
@@ -22,6 +22,11 @@ public class Callback : Node {
         Callback call = new Callback(action);
         node.AddChild(call);
         node.Connect(signal, call, nameof(Execute));
+        return call;
+    }
+    public static Callback ConnectOnce (Node node, string signal, Action action) {
+        var call = Connect(node, signal, action);
+        call.callOnce = true;
         return call;
     }
 }
