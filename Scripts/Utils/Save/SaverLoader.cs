@@ -10,15 +10,15 @@ namespace Utils {
         List<Resource> resources = new List<Resource>();
         List<Godot.Collections.Dictionary> encoded_resources = new List<Godot.Collections.Dictionary>();
 
-        public static string SaveSingle (Resource resource) {
+        public static string Save (Resource resource) {
             Saver saver = new Saver();
             saver.ToKey(resource);
             return saver.Flush();
         }
-        public static string SaveSingle (ISaveable saveable) {
+        public static string Save (ISaveable saveable) {
             Saver saver = new Saver();
-            var object_data = saver.EncodeObject(saveable);
-            return JSON.Print(object_data) + "\n" + saver.Flush();
+            var object_data = saver.SerializeObject(saveable);
+            return JSON.Print(object_data);
         }
         public string Flush () {
             if (encoded_resources.Count > 0) {
@@ -32,12 +32,12 @@ namespace Utils {
                 index = resources.Count;
                 resources.Add(resource);
                 encoded_resources.Add(null);
-                encoded_resources[index] = EncodeObject(resource);
+                encoded_resources[index] = SerializeObject(resource);
             }
             return index;
         }
 
-        private object Encode (object obj) {
+        private object Serialize (object obj) {
             if (obj == null) {
                 return null;
             }
@@ -45,7 +45,7 @@ namespace Utils {
                 return ToKey(resource);
             }
             if (obj is ISaveable saveable) {
-                return EncodeObject(saveable);
+                return SerializeObject(saveable);
             }
             if (obj is string s) {
                 return s;
@@ -60,20 +60,20 @@ namespace Utils {
                 return Encoding.EncodeNumeric(color.ToRgba64());
             }
             if (obj is IEnumerable<object> obj_enumerable) {
-                return obj_enumerable.Select(obj => Encode(obj)).ToGodotArray();
+                return obj_enumerable.Select(obj => Serialize(obj)).ToGodotArray();
             }
             if (obj is IEnumerable enumerable) {
-                return enumerable.Cast<object>().Select(obj => Encode(obj)).ToGodotArray();
+                return enumerable.Cast<object>().Select(obj => Serialize(obj)).ToGodotArray();
             }
             return obj;
         }
 
-        private Godot.Collections.Dictionary EncodeObject (object obj) {
+        private Godot.Collections.Dictionary SerializeObject (object obj) {
             Type type = obj.GetType();
             var data = new Godot.Collections.Dictionary();
             data["type"] = type.FullName;
             foreach (FieldInfo field in type.GetSaveableFields()) {
-                data[field.Name] = Encode(field.GetValue(obj));
+                data[field.Name] = Serialize(field.GetValue(obj));
             }
             return data;
         }
@@ -83,23 +83,43 @@ namespace Utils {
         List<Godot.Collections.Dictionary> encoded_resources = new List<Godot.Collections.Dictionary>();
         Dictionary<int, Resource> objects = new Dictionary<int, Resource>();
 
-        public static Loader Load (string value) {
+        public static Loader LoadThatCrashes (string value) { // Kunchan's function that needs repair
             Loader instance = new Loader();
             instance.encoded_resources = ((Godot.Collections.Array) JSON.Parse(value).Result).Cast<object>().Select(obj => (Godot.Collections.Dictionary) obj).ToList();
             return instance;
         }
-        public static object LoadSingle (string data) {
-            return Load(data).FromKey(0);
+
+        public static ISaveable Load (string data) { // Hedi's dirty function
+            return new Loader().FromData((Godot.Collections.Dictionary) JSON.Parse(data).Result);
         }
+
+        public static void LoadAndOverwrite (ISaveable obj, string data) { // Hedi's VERY dirty function (parce que je ne respecte rien)
+            Loader loader = new Loader();
+            var parsedData = (Godot.Collections.Dictionary) JSON.Parse(data).Result;
+
+            Type type = obj.GetType();
+            foreach (FieldInfo field in type.GetSaveableFields()) {
+                var value = loader.Deserialize(field.FieldType, parsedData[field.Name]);
+                if (value == null) {
+                    continue;
+                }
+                try {
+                    field.SetValue(obj, value);
+                } catch (Exception e) {
+                    GD.PrintErr($"{type}.{field.Name} = {value} failed");
+                    throw e;
+                }
+            }
+        }
+
 
         public ISaveable FromData (string data) {
             return FromData((Godot.Collections.Dictionary) JSON.Parse(data).Result);
         }
-
         public ISaveable FromData (Godot.Collections.Dictionary data) {
             Type type = Type.GetType((string) data["type"]);
             ISaveable saveable = (ISaveable) Activator.CreateInstance(type);
-            DecodeObject(saveable, data);
+            DeserializeObject(saveable, data);
             return saveable;
         }
 
@@ -108,12 +128,12 @@ namespace Utils {
                 Godot.Collections.Dictionary data = encoded_resources[key];
                 Type type = Type.GetType((string) data["type"]);
                 objects[key] = (Resource) Activator.CreateInstance(type);
-                DecodeObject(objects[key], data);
+                DeserializeObject(objects[key], data);
             }
             return objects[key];
         }
 
-        private object Decode (Type type, object data) {
+        private object Deserialize (Type type, object data) {
             if (data == null) {
                 return null;
             }
@@ -127,7 +147,7 @@ namespace Utils {
                 return (string) data;
             }
             if (type.IsEnum) {
-                return Enum.ToObject(type, Decode(Enum.GetUnderlyingType(type), data));
+                return Enum.ToObject(type, Deserialize(Enum.GetUnderlyingType(type), data));
             }
             if (type.IsNumeric()) {
                 return Convert.ChangeType(Encoding.DecodeNumeric((string) data), type);
@@ -137,7 +157,7 @@ namespace Utils {
             }
             if (typeof(IEnumerable).IsAssignableFrom(type)) {
                 Type elementType = type.GetElementType() ?? type.GenericTypeArguments[0];
-                var raw_enumerable = ((IEnumerable) data).Cast<object>().Select(v => Decode(elementType, v)).ToList();
+                var raw_enumerable = ((IEnumerable) data).Cast<object>().Select(v => Deserialize(elementType, v)).ToList();
                 var value = typeof(Enumerable)
                     .GetMethod("Cast")
                     .MakeGenericMethod(elementType)
@@ -164,7 +184,7 @@ namespace Utils {
 
         }
 
-        private object DecodeObject (object obj, object _data) {
+        private object DeserializeObject (object obj, object _data) {
             Godot.Collections.Dictionary data;
             if (_data == null) {
                 return null;
@@ -177,7 +197,7 @@ namespace Utils {
             }
             Type type = obj.GetType();
             foreach (FieldInfo field in type.GetSaveableFields()) {
-                var value = Decode(field.FieldType, data[field.Name]);
+                var value = Deserialize(field.FieldType, data[field.Name]);
                 if (value == null) {
                     continue;
                 }

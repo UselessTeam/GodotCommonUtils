@@ -1,7 +1,8 @@
 using System;
 using Godot;
+using Utils;
 
-public class VideoSettings : Control {
+public class VideoSettings : Control, ISaveable {
     // Changing the resolution will result in scaling the viewport to keep the same information on-screen
     //
     // A CanvasLayer and all of its children will be unaffected by the change in resolution (which is 
@@ -10,34 +11,77 @@ public class VideoSettings : Control {
     Vector2 baseResolution;
 
     const string resolutionSeparator = " x ";
-    OptionButton resolutionOptions;
+    SmartOptionButton resolutionOptions;
+
+
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready () {
         baseResolution = new Vector2((int) ProjectSettings.GetSetting("display/window/size/width"), (int) ProjectSettings.GetSetting("display/window/size/height"));
+        resolutionOptions = GetNode<SmartOptionButton>("VBoxContainer/Resolution/OptionButton");
+        LoadSettings();
 
-        resolutionOptions = GetNode<OptionButton>("VBoxContainer/Resolution/OptionButton");
+
+        resolutionOptions.Selected = ResolutionOption;
         resolutionOptions.Connect("item_selected", this, nameof(SetResolution));
 
-        GetNode<CheckBox>("VBoxContainer/Fullscreen/CheckBox").Connect("toggled", this, nameof(SetFullscreen));
+        var fullscreenCheckbox = GetNode<CheckBox>("VBoxContainer/Fullscreen/CheckBox");
+        fullscreenCheckbox.Pressed = Fullscreen;
+        fullscreenCheckbox.Connect("toggled", this, nameof(SetFullscreen));
         // GetNode<CheckBox>("VBoxContainer/Borderless/CheckBox").Connect("toggled", this, nameof(SetBorderless));
+
     }
 
-    void SetResolution (int idx) {
-        var newResolution = ToResolution(resolutionOptions.GetItemText(idx));
-        if (!OS.WindowFullscreen)
-            OS.WindowSize = newResolution;
+    void SaveSettings () {
+        FileEncoder.Write(Saver.Save(this), "video_settings".ToPath());
+    }
+    void LoadSettings () {
+        try {
+            //if (FileEncoder.SaveExists()) {
+            VideoSettings settings = (VideoSettings) Loader.Load(FileEncoder.Read("video_settings".ToPath()));
+            Fullscreen = settings.Fullscreen;
+            ResolutionOption = settings.ResolutionOption;
+        } catch (Exception) {
+            ResolutionOption = resolutionOptions.DefaultItem;
+        }
+    }
 
-        GetTree().SetScreenStretch(SceneTree.StretchMode.Disabled, SceneTree.StretchAspect.Ignore, newResolution); //TODO
+    [Save] int resolutionOption = 0;
+    int ResolutionOption {
+        get { return resolutionOption; }
+        set {
+            this.resolutionOption = value;
 
-        var canvasTransform = GetViewport().CanvasTransform;
-        canvasTransform.Scale = newResolution / baseResolution;
-        GetViewport().CanvasTransform = canvasTransform;
+            var newResolution = ToResolution(resolutionOptions.GetItemText(value));
+            if (!OS.WindowFullscreen)
+                OS.WindowSize = newResolution;
+
+            GetTree().SetScreenStretch(SceneTree.StretchMode.Disabled, SceneTree.StretchAspect.Ignore, newResolution); //TODO
+
+            var canvasTransform = GetViewport().CanvasTransform;
+            canvasTransform.Scale = newResolution / baseResolution;
+            GetViewport().CanvasTransform = canvasTransform;
+
+            SaveSettings();
+        }
+    }
+
+    void SetResolution (int idx) { ResolutionOption = idx; }
+
+    [Save] bool fullscreen = false;
+    bool Fullscreen {
+        get { return fullscreen; }
+        set {
+            fullscreen = value;
+            OS.WindowFullscreen = fullscreen;
+            SaveSettings();
+        }
     }
 
     void SetFullscreen (bool fullscreen) {
-        OS.WindowFullscreen = fullscreen;
+        Fullscreen = fullscreen;
     }
+
     // void SetBorderless (bool borderless) {
     //     OS.WindowBorderless = borderless;
     // }

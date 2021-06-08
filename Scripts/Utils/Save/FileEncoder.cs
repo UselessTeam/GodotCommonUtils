@@ -7,21 +7,21 @@ namespace Utils {
     public class FileEncoder {
         public static string Version = "0.0.0";
 
-        static readonly string savePath = "user://savegame.save";
+        const string defaultSavePath = "user://savegame.save";
 
         static readonly byte[] encodeKey = new byte[8] { 123, 111, 251, 227, 134, 180, 214, 252 };
 
-        public static void Write (string data) {
+        public static void Write (string data, string path = defaultSavePath) {
             var file = new File();
-            file.Open(savePath, File.ModeFlags.Write);
+            file.Open(path, File.ModeFlags.Write);
             file.StoreLine(Version);
             file.StoreString(data);
             file.Close();
         }
 
-        public static string Read () {
+        public static string Read (string path = defaultSavePath) {
             var file = new File();
-            file.Open(savePath, File.ModeFlags.Read);
+            file.Open(path, File.ModeFlags.Read);
             string foundVersion = file.GetLine();
             if (foundVersion != Version) {
                 throw new WrongVersionException(foundVersion);
@@ -31,13 +31,24 @@ namespace Utils {
             return data;
         }
 
-        public static void Delete () {
+        public static void Delete (string path = defaultSavePath) {
             var dir = new Directory();
-            dir.Remove(savePath);
+            dir.Remove(path);
         }
 
-        public static bool SaveExists () {
-            return new File().FileExists(savePath);
+        public static bool SaveExists (string path = defaultSavePath) {
+            var file = new File();
+            if (!file.FileExists(path)) return false;
+
+            file.Open(path, File.ModeFlags.Read);
+            string foundVersion = file.GetLine();
+            return (foundVersion == Version);
+        }
+    }
+
+    public static class StringExtensions {
+        public static string ToPath (this string name) {
+            return $"user://{name}.save";
         }
     }
 

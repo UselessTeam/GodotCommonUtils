@@ -2,9 +2,9 @@ using System;
 using Godot;
 
 public class SmartOptionButton : OptionButton {
-    [Export] string[] ItemList;
+    [Export] public string[] ItemList;
 
-    [Export] int DefaultItem;
+    [Export] public int DefaultItem;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready () {
