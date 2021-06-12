@@ -4,20 +4,20 @@ using Godot;
 
 public class TitleScreenButtons : VBoxContainer {
 
-    [Export] PackedScene newGameScene;
-    [Export] PackedScene loadGameScene;
+    [Export] PackedScene newGameScene = null;
+    [Export] PackedScene loadGameScene = null;
 
-    [Signal] public delegate void NewGame ();
-    [Signal] public delegate void LoadGame ();
+    [Signal] public delegate void NewGame();
+    [Signal] public delegate void LoadGame();
 
     List<Control> panels;
 
-    void HidePanels () {
+    void HidePanels() {
         foreach (var panel in panels)
             panel.Hide();
     }
 
-    public override void _Ready () {
+    public override void _Ready() {
         var loadButton = GetNode<Button>("LoadGame");
         if (!Utils.FileEncoder.SaveExists())
             loadButton.Disabled = true;

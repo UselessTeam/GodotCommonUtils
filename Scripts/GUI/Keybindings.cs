@@ -19,19 +19,19 @@ public class Keybindings : Control {
     [Export] bool SkipUiActions = true;
     [Export] bool SkipDebugActions = true;
 
-    [Export] NodePath buttonContainerPath;
+    [Export] NodePath buttonContainerPath = null;
     Control buttonContainer;
 
-    [Export] NodePath keybindingPopupPath;
+    [Export] NodePath keybindingPopupPath = null;
 
-    [Export] PackedScene keybindingElement;
+    [Export] PackedScene keybindingElement = null;
 
-    public override void _Ready () {
+    public override void _Ready() {
         Connect("draw", this, nameof(InitializeKeybindings));
         buttonContainer = GetNode<Control>(buttonContainerPath);
     }
 
-    void InitializeKeybindings () {
+    void InitializeKeybindings() {
         foreach (Node node in buttonContainer.GetChildren())
             node.QueueFree();
 
@@ -55,18 +55,18 @@ public class Keybindings : Control {
         }
     }
 
-    KeybindingElement GetKeybingingElement (string action) {
+    KeybindingElement GetKeybingingElement(string action) {
         foreach (var element in buttonContainer.GetChildren().Cast<KeybindingElement>())
             if (element.Action == action) return element;
         return null;
     }
 
-    void GetNewInput (string action) {
+    void GetNewInput(string action) {
         GetNode<Control>(keybindingPopupPath).Show();
         ActionWaitingForInput = action;
     }
 
-    public override void _Input (InputEvent _event) {
+    public override void _Input(InputEvent _event) {
         var method = _event.InputMethod();
         if (method == InputMethod.None) return;
 
@@ -88,7 +88,7 @@ public class Keybindings : Control {
 }
 
 public static class InputEventExtension {
-    public static Keybindings.InputMethod InputMethod (this InputEvent _event) {
+    public static Keybindings.InputMethod InputMethod(this InputEvent _event) {
         if (_event is InputEventKey || (_event is InputEventMouseButton && !(_event as InputEventMouseButton).Pressed))
             return Keybindings.InputMethod.Keyboard;
         else if (_event is InputEventJoypadButton || (_event is InputEventJoypadMotion && Mathf.Abs((_event as InputEventJoypadMotion).AxisValue) > 0.5))
@@ -97,11 +97,11 @@ public static class InputEventExtension {
             return Keybindings.InputMethod.None;
     }
 
-    public static bool MatchInputMethod (this InputEvent _event, Keybindings.InputMethod method) {
+    public static bool MatchInputMethod(this InputEvent _event, Keybindings.InputMethod method) {
         return _event.InputMethod() == method;
     }
 
-    public static InputEvent ToAbsolute (this InputEvent _event) {
+    public static InputEvent ToAbsolute(this InputEvent _event) {
         if (_event is InputEventKey)
             return _event;
         else if (_event is InputEventMouseButton) {
@@ -119,7 +119,7 @@ public static class InputEventExtension {
 
     // Deprecated for now, use AsText() instead
     //
-    public static string AsPrettyText (this InputEvent _event) {
+    public static string AsPrettyText(this InputEvent _event) {
         if (_event is InputEventKey)
             return _event.AsText();
         else if (_event is InputEventMouseButton)

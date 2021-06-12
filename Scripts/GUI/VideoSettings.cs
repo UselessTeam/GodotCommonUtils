@@ -13,14 +13,11 @@ public class VideoSettings : Control, ISaveable {
     const string resolutionSeparator = " x ";
     SmartOptionButton resolutionOptions;
 
-
-
     // Called when the node enters the scene tree for the first time.
-    public override void _Ready () {
+    public override void _Ready() {
         baseResolution = new Vector2((int) ProjectSettings.GetSetting("display/window/size/width"), (int) ProjectSettings.GetSetting("display/window/size/height"));
         resolutionOptions = GetNode<SmartOptionButton>("VBoxContainer/Resolution/OptionButton");
         LoadSettings();
-
 
         resolutionOptions.Selected = ResolutionOption;
         resolutionOptions.Connect("item_selected", this, nameof(SetResolution));
@@ -32,21 +29,29 @@ public class VideoSettings : Control, ISaveable {
 
     }
 
-    void SaveSettings () {
+    void SaveSettings() {
         FileEncoder.Write(Saver.Save(this), "video_settings".ToPath());
     }
-    void LoadSettings () {
+
+    void LoadSettings() {
         try {
-            //if (FileEncoder.SaveExists()) {
-            VideoSettings settings = (VideoSettings) Loader.Load(FileEncoder.Read("video_settings".ToPath()));
-            Fullscreen = settings.Fullscreen;
-            ResolutionOption = settings.ResolutionOption;
+            if (FileEncoder.SaveVersionMatches("video_settings".ToPath())) {
+                VideoSettings settings = (VideoSettings) Loader.Load(FileEncoder.Read("video_settings".ToPath()));
+                Fullscreen = settings.Fullscreen;
+                ResolutionOption = settings.ResolutionOption;
+            } else
+                LoadDefaultSettings();
         } catch (Exception) {
-            ResolutionOption = resolutionOptions.DefaultItem;
+            LoadDefaultSettings();
         }
     }
 
-    [Save] int resolutionOption = 0;
+    void LoadDefaultSettings() {
+        ResolutionOption = resolutionOptions.DefaultItem;
+        Fullscreen = false;
+    }
+
+    [Save] int resolutionOption;
     int ResolutionOption {
         get { return resolutionOption; }
         set {
@@ -66,9 +71,9 @@ public class VideoSettings : Control, ISaveable {
         }
     }
 
-    void SetResolution (int idx) { ResolutionOption = idx; }
+    void SetResolution(int idx) { ResolutionOption = idx; }
 
-    [Save] bool fullscreen = false;
+    [Save] bool fullscreen;
     bool Fullscreen {
         get { return fullscreen; }
         set {
@@ -78,15 +83,15 @@ public class VideoSettings : Control, ISaveable {
         }
     }
 
-    void SetFullscreen (bool fullscreen) {
-        Fullscreen = fullscreen;
+    void SetFullscreen(bool set_fullscreen) {
+        Fullscreen = set_fullscreen;
     }
 
     // void SetBorderless (bool borderless) {
     //     OS.WindowBorderless = borderless;
     // }
 
-    Vector2 ToResolution (string resolutionString) {
+    Vector2 ToResolution(string resolutionString) {
         int mid = resolutionString.Find(resolutionSeparator);
         int midLength = resolutionSeparator.Length;
         int end = resolutionString.Find("(");
