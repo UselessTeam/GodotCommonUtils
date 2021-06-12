@@ -8,6 +8,8 @@ public class VideoSettings : Control, ISaveable {
     // A CanvasLayer and all of its children will be unaffected by the change in resolution (which is 
     // usefull in the case of Control nodes that already naturally scale with the resolution)
 
+    [Export] bool enable = false;
+
     Vector2 baseResolution;
 
     const string resolutionSeparator = " x ";
@@ -15,18 +17,19 @@ public class VideoSettings : Control, ISaveable {
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready() {
-        baseResolution = new Vector2((int) ProjectSettings.GetSetting("display/window/size/width"), (int) ProjectSettings.GetSetting("display/window/size/height"));
-        resolutionOptions = GetNode<SmartOptionButton>("VBoxContainer/Resolution/OptionButton");
-        LoadSettings();
+        if (enable) {
+            baseResolution = new Vector2((int) ProjectSettings.GetSetting("display/window/size/width"), (int) ProjectSettings.GetSetting("display/window/size/height"));
+            resolutionOptions = GetNode<SmartOptionButton>("VBoxContainer/Resolution/OptionButton");
+            LoadSettings();
 
-        resolutionOptions.Selected = ResolutionOption;
-        resolutionOptions.Connect("item_selected", this, nameof(SetResolution));
+            resolutionOptions.Selected = ResolutionOption;
+            resolutionOptions.Connect("item_selected", this, nameof(SetResolution));
 
-        var fullscreenCheckbox = GetNode<CheckBox>("VBoxContainer/Fullscreen/CheckBox");
-        fullscreenCheckbox.Pressed = Fullscreen;
-        fullscreenCheckbox.Connect("toggled", this, nameof(SetFullscreen));
-        // GetNode<CheckBox>("VBoxContainer/Borderless/CheckBox").Connect("toggled", this, nameof(SetBorderless));
-
+            var fullscreenCheckbox = GetNode<CheckBox>("VBoxContainer/Fullscreen/CheckBox");
+            fullscreenCheckbox.Pressed = Fullscreen;
+            fullscreenCheckbox.Connect("toggled", this, nameof(SetFullscreen));
+            // GetNode<CheckBox>("VBoxContainer/Borderless/CheckBox").Connect("toggled", this, nameof(SetBorderless));
+        }
     }
 
     void SaveSettings() {
