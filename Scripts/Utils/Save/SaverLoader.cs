@@ -17,9 +17,20 @@ namespace Utils {
         }
         public static string Save (ISaveable saveable) {
             Saver saver = new Saver();
-            var object_data = saver.SerializeObject(saveable);
+            var object_data = saver.CreateAndSerialize(saveable);
             return JSON.Print(object_data);
         }
+        public static string Save (object _object) {
+            var saver = new Saver();
+            object serialization = saver.Serialize(_object);
+            if (serialization == null) return null;
+            if (serialization is string) return JSON.Print(new Godot.Collections.Dictionary() { { "type", _object.GetType().FullName }, { "value", serialization } });
+            if (serialization is int) return JSON.Print(saver.encoded_resources[(int) serialization]);
+            if (serialization is Godot.Collections.Dictionary) return JSON.Print((Godot.Collections.Dictionary) serialization);
+            if (serialization is Godot.Collections.Array) { GD.PrintErr("Godot array doesn't work"); return null; }
+            return null;
+        }
+
         public string Flush () {
             if (encoded_resources.Count > 0) {
                 return JSON.Print(encoded_resources);
@@ -32,7 +43,7 @@ namespace Utils {
                 index = resources.Count;
                 resources.Add(resource);
                 encoded_resources.Add(null);
-                encoded_resources[index] = SerializeObject(resource);
+                encoded_resources[index] = CreateAndSerialize(resource);
             }
             return index;
         }
@@ -45,7 +56,7 @@ namespace Utils {
                 return ToKey(resource);
             }
             if (obj is ISaveable saveable) {
-                return SerializeObject(saveable);
+                return CreateAndSerialize(saveable);
             }
             if (obj is string s) {
                 return s;
@@ -68,7 +79,7 @@ namespace Utils {
             return obj;
         }
 
-        private Godot.Collections.Dictionary SerializeObject (object obj) {
+        private Godot.Collections.Dictionary CreateAndSerialize (object obj) {
             Type type = obj.GetType();
             var data = new Godot.Collections.Dictionary();
             data["type"] = type.FullName;
@@ -89,46 +100,28 @@ namespace Utils {
             return instance;
         }
 
-        public static ISaveable Load (string data) { // Hedi's dirty function
-            return new Loader().FromData((Godot.Collections.Dictionary) JSON.Parse(data).Result);
-        }
+        public static object Load (string data) { // Hedi's function
+            var dict = (Godot.Collections.Dictionary) JSON.Parse(data).Result;
+            Type type = Type.GetType((string) dict["type"]);
 
-        public static void LoadAndOverwrite (ISaveable obj, string data) { // Hedi's VERY dirty function (parce que je ne respecte rien)
-            Loader loader = new Loader();
-            var parsedData = (Godot.Collections.Dictionary) JSON.Parse(data).Result;
-
-            Type type = obj.GetType();
-            foreach (FieldInfo field in type.GetSaveableFields()) {
-                var value = loader.Deserialize(field.FieldType, parsedData[field.Name]);
-                if (value == null) {
-                    continue;
-                }
-                try {
-                    field.SetValue(obj, value);
-                } catch (Exception e) {
-                    GD.PrintErr($"{type}.{field.Name} = {value} failed");
-                    throw e;
-                }
+            if (type.GetInterfaces().Contains(typeof(ISaveable)) || typeof(Resource).IsAssignableFrom(type)) {
+                return new Loader().CreateAndDeserialize(type, dict);
+            } else {
+                return new Loader().Deserialize(type, dict["value"]);
             }
         }
-
-
-        public ISaveable FromData (string data) {
-            return FromData((Godot.Collections.Dictionary) JSON.Parse(data).Result);
-        }
-        public ISaveable FromData (Godot.Collections.Dictionary data) {
-            Type type = Type.GetType((string) data["type"]);
-            ISaveable saveable = (ISaveable) Activator.CreateInstance(type);
-            DeserializeObject(saveable, data);
-            return saveable;
+        public static List<object> LoadMany (string datas) {
+            var list = new List<object>();
+            foreach (string data in datas.Split("\n"))
+                list.Add(Load(data));
+            return list;
         }
 
         public Resource FromKey (int key) {
             if (!objects.ContainsKey(key)) {
                 Godot.Collections.Dictionary data = encoded_resources[key];
                 Type type = Type.GetType((string) data["type"]);
-                objects[key] = (Resource) Activator.CreateInstance(type);
-                DeserializeObject(objects[key], data);
+                objects[key] = (Godot.Resource) CreateAndDeserialize(type, data);
             }
             return objects[key];
         }
@@ -141,7 +134,7 @@ namespace Utils {
                 return FromKey(Convert.ToInt32((float) data));
             }
             if (typeof(ISaveable).IsAssignableFrom(type)) {
-                return FromData((Godot.Collections.Dictionary) data);
+                return CreateAndDeserialize(type, (Godot.Collections.Dictionary) data);
             }
             if (type == typeof(string)) {
                 return (string) data;
@@ -178,24 +171,14 @@ namespace Utils {
                 try {
                     return Activator.CreateInstance(type, data);
                 } catch {
-                    return Activator.CreateInstance(type, Convert.ToInt32(data));
+                    throw new FormatException();
                 }
             }
 
         }
 
-        private object DeserializeObject (object obj, object _data) {
-            Godot.Collections.Dictionary data;
-            if (_data == null) {
-                return null;
-            } else if (_data is Godot.Collections.Dictionary<string, object> strObjDict) {
-                data = (Godot.Collections.Dictionary) strObjDict;
-            } else if (_data is Godot.Collections.Dictionary nDict) {
-                data = nDict;
-            } else {
-                throw new Exception("Type of data " + _data.GetType() + " could not be casted");
-            }
-            Type type = obj.GetType();
+        private object CreateAndDeserialize (Type type, Godot.Collections.Dictionary data) {
+            object obj = Activator.CreateInstance(type);
             foreach (FieldInfo field in type.GetSaveableFields()) {
                 var value = Deserialize(field.FieldType, data[field.Name]);
                 if (value == null) {

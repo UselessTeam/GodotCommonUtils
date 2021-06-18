@@ -42,7 +42,7 @@ namespace Utils {
         }
 
         private static string RandomUncheckedString () {
-            float x = (float) RNG.rng.NextDouble();
+            float x = (float) RNG.Get.NextDouble();
             if (x < 0.10) {
                 return PREFIX.Random() + VOWEL.Random();
             }

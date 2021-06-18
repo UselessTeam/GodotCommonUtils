@@ -11,7 +11,7 @@ namespace Utils {
 
         static readonly byte[] encodeKey = new byte[8] { 123, 111, 251, 227, 134, 180, 214, 252 };
 
-        public static void Write(string data, string path = defaultSavePath) {
+        public static void Write (string data, string path = defaultSavePath) {
             var file = new File();
             file.Open(path, File.ModeFlags.Write);
             file.StoreLine(Version);
@@ -19,7 +19,7 @@ namespace Utils {
             file.Close();
         }
 
-        public static string Read(string path = defaultSavePath) {
+        public static string Read (string path = defaultSavePath) {
             var file = new File();
             file.Open(path, File.ModeFlags.Read);
             string foundVersion = file.GetLine();
@@ -31,16 +31,16 @@ namespace Utils {
             return data;
         }
 
-        public static void Delete(string path = defaultSavePath) {
+        public static void Delete (string path = defaultSavePath) {
             var dir = new Directory();
             dir.Remove(path);
         }
 
-        public static bool SaveExists(string path = defaultSavePath) {
+        public static bool SaveExists (string path = defaultSavePath) {
             var file = new File();
             return file.FileExists(path);
         }
-        public static bool SaveVersionMatches(string path = defaultSavePath) {
+        public static bool SaveVersionMatches (string path = defaultSavePath) {
             var file = new File();
             if (!file.FileExists(path)) return false;
 
@@ -51,7 +51,7 @@ namespace Utils {
     }
 
     public static class StringExtensions {
-        public static string ToPath(this string name) {
+        public static string ToPath (this string name) {
             return $"user://{name}.save";
         }
     }
@@ -59,11 +59,11 @@ namespace Utils {
     public class WrongVersionException : Exception {
         public string FoundVersion;
 
-        public WrongVersionException(string FoundVersion) {
+        public WrongVersionException (string FoundVersion) {
             this.FoundVersion = FoundVersion;
         }
 
-        public string GetMessage() {
+        public string GetMessage () {
             return $"The last save was made with version {FoundVersion} of the game,\nwhich is not compatible with current version {FileEncoder.Version} of the game\nYou will have to start a new game";
         }
     }

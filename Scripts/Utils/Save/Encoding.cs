@@ -4,11 +4,11 @@ using Godot;
 
 namespace Utils {
     public static class Encoding {
-        public static Godot.Collections.Array<T> ToGodotArray<T>(this IEnumerable<T> enumerable) {
+        public static Godot.Collections.Array<T> ToGodotArray<T> (this IEnumerable<T> enumerable) {
             return new Godot.Collections.Array<T>(enumerable);
         }
 
-        public static bool IsNumeric(this Type type) {
+        public static bool IsNumeric (this Type type) {
             if (!type.IsValueType) {
                 return false;
             }
@@ -27,16 +27,16 @@ namespace Utils {
             }
         }
 
-        public static string EncodeNumeric(long i) {
+        public static string EncodeNumeric (long i) {
             return Convert.ToBase64String(BitConverter.GetBytes(i)).TrimEnd('A', '=');
         }
 
-        public static long DecodeNumeric(string s) {
+        public static long DecodeNumeric (string s) {
             s = s + "AAAAAAAAAAA=".Substring(s.Length);
             return BitConverter.ToInt64(Convert.FromBase64String(s), 0);
         }
 
-        public static int DecodeInt(string s) {
+        public static int DecodeInt (string s) {
             s = s + "AAAAAA==".Substring(s.Length);
             return BitConverter.ToInt32(Convert.FromBase64String(s), 0);
         }

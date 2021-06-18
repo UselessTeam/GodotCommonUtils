@@ -5,13 +5,24 @@ using Godot;
 
 namespace Utils {
     public static class RNG {
-        public static Random rng { get; } = new Random();
+        static int currentSeed = new Random().Next();
+        static Random rand = new Random(currentSeed);
+
+        public static Random Get { get { return rand; } }
+        public static int Seed {
+            get { return currentSeed; }
+            set {
+                currentSeed = value;
+                rand = new Random(value);
+                GD.Print("Change seed to ", value);
+            }
+        }
 
         public static T Random<T> (this T[] list) {
-            return list[rng.Next(0, list.Length)];
+            return list[Get.Next(0, list.Length)];
         }
         public static T Random<T> (this IEnumerable<T> list) {
-            return list.ElementAt(rng.Next(0, list.Count()));
+            return list.ElementAt(Get.Next(0, list.Count()));
         }
 
         public static T PopRandom<T> (this List<T> list) {
