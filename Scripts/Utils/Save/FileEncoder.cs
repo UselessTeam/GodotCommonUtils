@@ -12,23 +12,23 @@ namespace Utils {
         static readonly byte[] encodeKey = new byte[8] { 123, 111, 251, 227, 134, 180, 214, 252 };
 
         public static void Write (string data, string path = defaultSavePath) {
-            var file = new File();
-            file.Open(path, File.ModeFlags.Write);
-            file.StoreLine(Version);
-            file.StoreString(data);
-            file.Close();
+            using (var file = new File()) {
+                file.Open(path, File.ModeFlags.Write);
+                file.StoreLine(Version);
+                file.StoreString(data);
+            }
         }
 
         public static string Read (string path = defaultSavePath) {
-            var file = new File();
-            file.Open(path, File.ModeFlags.Read);
-            string foundVersion = file.GetLine();
-            if (foundVersion != Version) {
-                throw new WrongVersionException(foundVersion);
-            };
-            string data = file.GetLine();
-            file.Close();
-            return data;
+            using (var file = new File()) {
+                file.Open(path, File.ModeFlags.Read);
+                string foundVersion = file.GetLine();
+                if (foundVersion != Version) {
+                    throw new WrongVersionException(foundVersion);
+                };
+                string data = file.GetAsText();
+                return data.Split("\n", 2).Skip(1).FirstOrDefault();
+            }
         }
 
         public static void Delete (string path = defaultSavePath) {
@@ -41,12 +41,13 @@ namespace Utils {
             return file.FileExists(path);
         }
         public static bool SaveVersionMatches (string path = defaultSavePath) {
-            var file = new File();
-            if (!file.FileExists(path)) return false;
+            using (var file = new File()) {
+                if (!file.FileExists(path)) return false;
 
-            file.Open(path, File.ModeFlags.Read);
-            string foundVersion = file.GetLine();
-            return (foundVersion == Version);
+                file.Open(path, File.ModeFlags.Read);
+                string foundVersion = file.GetLine();
+                return (foundVersion == Version);
+            }
         }
     }
 

@@ -50,6 +50,7 @@ public class VideoSettings : Control, ISaveable {
     }
 
     void LoadDefaultSettings () {
+        GD.Print("Graphical settings not found, loading default graphical settings");
         Resolution = OptionToResolution(resolutionOptions.DefaultItem);
         Fullscreen = false;
     }
