@@ -1,11 +1,11 @@
 [gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://GodotCommonUtils/Scripts/GUI/Keybindings.cs" type="Script" id=1]
-[ext_resource path="res://GodotCommonUtils/Scenes/KeybindingElement.tscn" type="PackedScene" id=2]
-[ext_resource path="res://GodotCommonUtils/Scripts/GodotExtensions/SmartOptionButton.cs" type="Script" id=3]
-[ext_resource path="res://GodotCommonUtils/Scripts/GUI/VideoSettings.cs" type="Script" id=4]
-[ext_resource path="res://GodotCommonUtils/Scripts/GUI/SplashScreen.cs" type="Script" id=5]
-[ext_resource path="res://GodotCommonUtils/Scripts/GUI/TitleScreenButtons.cs" type="Script" id=6]
+[ext_resource path="res://GodotCommonUtils/Scripts/GUI/SplashScreen.cs" type="Script" id=2]
+[ext_resource path="res://GodotCommonUtils/Scripts/GUI/VideoSettings.cs" type="Script" id=3]
+[ext_resource path="res://GodotCommonUtils/Scripts/GUI/TitleScreenButtons.cs" type="Script" id=4]
+[ext_resource path="res://GodotCommonUtils/Scripts/GodotExtensions/SmartOptionButton.cs" type="Script" id=5]
+[ext_resource path="res://GodotCommonUtils/Scenes/KeybindingElement.tscn" type="PackedScene" id=6]
 
 [sub_resource type="Animation" id=1]
 length = 3.0
@@ -81,13 +81,15 @@ anchor_right = 0.9
 anchor_bottom = 0.6
 size_flags_vertical = 3
 custom_constants/separation = 20
-script = ExtResource( 6 )
+script = ExtResource( 4 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
+buttonPaths = [ NodePath("Settings"), NodePath("Credits") ]
+panelPaths = [ NodePath("../Settings"), NodePath("../Credits") ]
 
 [node name="LoadGame" type="Button" parent="Menu/Menu buttons"]
-margin_right = 204.0
+margin_right = 320.0
 margin_bottom = 20.0
 text = "Load Game"
 __meta__ = {
@@ -96,13 +98,13 @@ __meta__ = {
 
 [node name="StartGame" type="Button" parent="Menu/Menu buttons"]
 margin_top = 40.0
-margin_right = 204.0
+margin_right = 320.0
 margin_bottom = 60.0
 text = "New Game"
 
 [node name="Settings" type="Button" parent="Menu/Menu buttons"]
 margin_top = 80.0
-margin_right = 204.0
+margin_right = 320.0
 margin_bottom = 100.0
 text = "Settings"
 __meta__ = {
@@ -111,7 +113,7 @@ __meta__ = {
 
 [node name="Credits" type="Button" parent="Menu/Menu buttons"]
 margin_top = 120.0
-margin_right = 204.0
+margin_right = 320.0
 margin_bottom = 140.0
 text = "Credits"
 __meta__ = {
@@ -120,7 +122,7 @@ __meta__ = {
 
 [node name="Quit" type="Button" parent="Menu/Menu buttons"]
 margin_top = 160.0
-margin_right = 204.0
+margin_right = 320.0
 margin_bottom = 180.0
 text = "Quit"
 __meta__ = {
@@ -152,7 +154,7 @@ __meta__ = {
 }
 buttonContainerPath = NodePath("ScrollContainer/VBoxContainer")
 keybindingPopupPath = NodePath("../../KeybindingPopup")
-keybindingElement = ExtResource( 2 )
+keybindingElement = ExtResource( 6 )
 
 [node name="ScrollContainer" type="ScrollContainer" parent="Menu/Settings/Keybindings"]
 anchor_right = 1.0
@@ -162,7 +164,7 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Menu/Settings/Keybindings/ScrollContainer"]
-margin_right = 401.6
+margin_right = 632.0
 size_flags_horizontal = 3
 custom_constants/separation = 10
 alignment = 1
@@ -178,7 +180,7 @@ margin_left = 4.0
 margin_top = 32.0
 margin_right = -4.0
 margin_bottom = -4.0
-script = ExtResource( 4 )
+script = ExtResource( 3 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Menu/Settings/Display"]
 anchor_right = 1.0
@@ -252,7 +254,7 @@ margin_right = 632.0
 margin_bottom = 20.0
 size_flags_horizontal = 3
 align = 1
-script = ExtResource( 3 )
+script = ExtResource( 5 )
 ItemList = PoolStringArray( "1024 x 768 (4:3)", "1280 x 1024 (5:4)", "1366 x 768 (16:9)", "1440 x 900 (16:10)", "1600 x 900 (16:9)", "1680 x 1050 (16:10)", "1920 x 1080 (16:9)", "1920 x 1200 (16:10)", "2560 x 1440 (16:9)", "3840 x 2160 (16:9)" )
 DefaultItem = 4
 
@@ -319,7 +321,7 @@ valign = 1
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = ExtResource( 5 )
+script = ExtResource( 2 )
 __meta__ = {
 "_edit_use_anchors_": false
 }

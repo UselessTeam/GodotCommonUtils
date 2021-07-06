@@ -3,21 +3,24 @@ using System.Collections.Generic;
 using Godot;
 
 public class TitleScreenButtons : VBoxContainer {
-
     [Export] PackedScene newGameScene = null;
     [Export] PackedScene loadGameScene = null;
 
-    [Signal] public delegate void NewGame();
-    [Signal] public delegate void LoadGame();
+    [Export] List<NodePath> buttonPaths;
+    [Export] List<NodePath> panelPaths;
 
-    List<Control> panels;
 
-    void HidePanels() {
+    [Signal] public delegate void NewGame ();
+    [Signal] public delegate void LoadGame ();
+
+    List<Control> panels = new List<Control>();
+
+    void HidePanels () {
         foreach (var panel in panels)
             panel.Hide();
     }
 
-    public override void _Ready() {
+    public override void _Ready () {
         var loadButton = GetNode<Button>("LoadGame");
         if (!Utils.FileEncoder.SaveExists())
             loadButton.Disabled = true;
@@ -33,29 +36,20 @@ public class TitleScreenButtons : VBoxContainer {
             GetTree().ChangeSceneTo(newGameScene);
         });
 
-        panels = new List<Control>() {
-            GetNode<Control>("../Settings"),
-            GetNode<Control>("../Credits")
-        };
+        for (int i = 0 ; i < panelPaths.Count ; i++)
+            panels.Add(GetNode<Control>(panelPaths[i]));
 
-        Callback.Connect(GetNode<Button>("Settings"), "pressed", () => {
-            var settings = panels[0];
-            if (settings.Visible)
-                settings.Hide();
-            else {
-                HidePanels();
-                settings.Show();
-            }
-        });
-
-        Callback.Connect(GetNode<Button>("Credits"), "pressed", () => {
-            var credits = panels[1];
-            if (credits.Visible) credits.Hide();
-            else {
-                HidePanels();
-                credits.Show();
-            }
-        });
+        for (int i = 0 ; i < Math.Min(buttonPaths.Count, panelPaths.Count) ; i++) {
+            int j = i;
+            GD.Print(i);
+            Callback.Connect(GetNode<Control>(buttonPaths[i]), "pressed", () => {
+                if (panels[j].Visible) panels[j].Hide();
+                else {
+                    HidePanels();
+                    panels[j].Show();
+                }
+            });
+        }
 
         Callback.Connect(GetNode<Button>("Quit"), "pressed", () => GetTree().Quit());
 
