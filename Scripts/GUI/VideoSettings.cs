@@ -38,7 +38,7 @@ public class VideoSettings : Control, ISaveable {
 
     void LoadSettings () {
         try {
-            if (FileEncoder.SaveVersionMatches("video_settings".ToPath())) {
+            if (FileEncoder.SaveIsCompatible("video_settings".ToPath())) {
                 VideoSettings settings = (VideoSettings) Loader.Load(FileEncoder.Read("video_settings".ToPath()));
                 Fullscreen = settings.Fullscreen;
                 SetResolutionFromOption(settings.resolutionOption);
