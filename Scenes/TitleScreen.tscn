@@ -70,6 +70,10 @@ __meta__ = {
 [node name="MenuBackground" type="TextureRect" parent="Menu"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+margin_left = 4.495
+margin_top = 2.24744
+margin_right = 4.495
+margin_bottom = 2.24744
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -316,6 +320,15 @@ anchor_bottom = 0.95
 text = "People's names"
 align = 1
 valign = 1
+
+[node name="ConfirmationDialog" type="ConfirmationDialog" parent="Menu"]
+margin_left = 601.0
+margin_top = 382.0
+margin_right = 940.0
+margin_bottom = 457.0
+window_title = ""
+dialog_text = "Are you sure you want to start a new game?
+This action will overwrite your current progress."
 
 [node name="SplashScreen" type="Control" parent="."]
 visible = false

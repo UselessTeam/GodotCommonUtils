@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using Godot;
 
 public class TitleScreenButtons : VBoxContainer {
-    [Export] PackedScene newGameScene = null;
-    [Export] PackedScene loadGameScene = null;
+    [Export] public PackedScene newGameScene = null;
+    [Export] public PackedScene loadGameScene = null;
+    [Export] public NodePath newGameConfirmationPath = null;
 
     [Export] List<NodePath> buttonPaths;
     [Export] List<NodePath> panelPaths;
@@ -31,9 +32,19 @@ public class TitleScreenButtons : VBoxContainer {
             });
         }
 
-        Callback.Connect(GetNode<Button>("StartGame"), "pressed", () => {
+        Action startNewGame = () => {
             EmitSignal(nameof(NewGame));
             GetTree().ChangeSceneTo(newGameScene);
+        };
+
+        Callback.Connect(GetNode<Button>("StartGame"), "pressed", () => {
+            if (newGameConfirmationPath == null) {
+                startNewGame();
+                return;
+            }
+            AcceptDialog confirmation = GetNode<AcceptDialog>(newGameConfirmationPath);
+            confirmation.Popup_();
+            Callback.ConnectOnce(confirmation, "confirmed", startNewGame);
         });
 
         for (int i = 0 ; i < panelPaths.Count ; i++)
@@ -41,7 +52,6 @@ public class TitleScreenButtons : VBoxContainer {
 
         for (int i = 0 ; i < Math.Min(buttonPaths.Count, panelPaths.Count) ; i++) {
             int j = i;
-            GD.Print(i);
             Callback.Connect(GetNode<Control>(buttonPaths[i]), "pressed", () => {
                 if (panels[j].Visible) panels[j].Hide();
                 else {
@@ -52,7 +62,6 @@ public class TitleScreenButtons : VBoxContainer {
         }
 
         Callback.Connect(GetNode<Button>("Quit"), "pressed", () => GetTree().Quit());
-
     }
 
 }
